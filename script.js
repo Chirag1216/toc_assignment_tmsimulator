@@ -2,8 +2,10 @@
 // Turing Machine Simulator — Core Engine
 // ============================================================
 
-const CELL_WIDTH = 64; // 60px cell + 4px gap
-const TAPE_VISIBLE_SIZE = 41; // odd, so head sits on center
+// Must be odd so the head cell is the middle one. Cells are symmetric around head,
+// then justify-content: center + overflow-x: hidden keeps the head-cell at viewport center
+// regardless of actual cell width (works with responsive breakpoints).
+const TAPE_VISIBLE_SIZE = 41;
 const BLANK_DEFAULT = '_';
 
 // ---------- State ----------
@@ -363,12 +365,8 @@ function renderTape(writtenPos = null) {
 
     tapeTrack.appendChild(cell);
   }
-  // center track so head cell lines up with .tape-head (which is centered)
-  // Because .tape-track uses padding: 0 50%, the content is already centered.
-  // Each cell is 60px + 4px gap = 64px. We need the head's cell (index pad) to sit at center.
-  // The padding already places the first cell at center; subsequent cells extend to the right.
-  // We want cell #pad to be centered, so shift track left by pad * CELL_WIDTH.
-  tapeTrack.style.transform = `translateX(-${pad * CELL_WIDTH}px)`;
+  // No manual transform: cells are symmetric around TM.head (pad on each side),
+  // flex `justify-content: center` centers the middle cell at the viewport center.
 }
 
 // ---------- UI Updates ----------
