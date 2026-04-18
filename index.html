@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Turing Machine Simulator — TOC</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <!-- <div class="logo">TM</div> -->
+        <div class="title-wrap">
+          <h1>Turing Machine Simulator</h1>
+          <p>Theory of Computation — Interactive Visualizer</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <span class="status-badge" id="statusBadge">IDLE</span>
+        <select id="presetSelect" class="preset-select" title="Load a preset machine">
+          <!-- <option value="">— Load Preset —</option> -->
+          <option value="palindrome">Palindrome Checker (0/1)</option>
+          <option value="binaryIncrement">Binary Increment (+1)</option>
+          <option value="binaryAdder">Binary Adder (a+b)</option>
+          <option value="unaryDouble">Unary Doubler (n → 2n)</option>
+          <option value="zerosEqualOnes">Equal 0s and 1s (aⁿbⁿ)</option>
+          <option value="copy">String Copier</option>
+          <option value="reverse">String Reverser</option>
+          <option value="parity">Even Number of 1s</option>
+        </select>
+      </div>
+    </header>
+
+    <main class="main-grid">
+      <!-- Left: Tape + Controls -->
+      <section class="panel tape-panel">
+        <div class="panel-header">
+          <h2>Tape</h2>
+          <div class="state-display">
+            <span class="state-label">Current State</span>
+            <span id="currentState" class="state-value">q0</span>
+          </div>
+        </div>
+
+        <div class="tape-viewport">
+          <div class="tape-track" id="tapeTrack"></div>
+          <div class="tape-head" id="tapeHead">
+            <div class="head-arrow">▼</div>
+            <div class="head-box"></div>
+          </div>
+        </div>
+
+        <div class="tape-meta">
+          <div class="meta-item"><span>Head Position</span><strong id="headPos">0</strong></div>
+          <div class="meta-item"><span>Steps</span><strong id="stepCount">0</strong></div>
+          <div class="meta-item"><span>Symbol Read</span><strong id="symbolRead">_</strong></div>
+          <div class="meta-item"><span>Result</span><strong id="resultBadge">—</strong></div>
+        </div>
+
+        <div class="input-row">
+          <label for="inputTape">Input:</label>
+          <input type="text" id="inputTape" placeholder="e.g. 1011" value="1011" />
+          <button id="loadInputBtn" class="btn btn-secondary">Load</button>
+        </div>
+
+        <div class="controls">
+          <button id="stepBtn" class="btn btn-primary" title="Execute one transition">
+            <span class="btn-icon">⏭</span> Step
+          </button>
+          <button id="runBtn" class="btn btn-accent" title="Run until halt">
+            <span class="btn-icon">▶</span> Run
+          </button>
+          <button id="pauseBtn" class="btn btn-warn" title="Pause" disabled>
+            <span class="btn-icon">⏸</span> Pause
+          </button>
+          <button id="resetBtn" class="btn btn-secondary" title="Reset tape">
+            <span class="btn-icon">⟲</span> Reset
+          </button>
+          <div class="speed-control">
+            <label for="speedSlider">Speed</label>
+            <input type="range" id="speedSlider" min="50" max="1000" value="350" step="50" />
+            <span id="speedVal">350ms</span>
+          </div>
+        </div>
+
+        <div class="panel-header sub">
+          <h3>Execution Log</h3>
+          <button id="clearLogBtn" class="btn btn-mini">Clear</button>
+        </div>
+        <div class="log" id="logBox"></div>
+      </section>
+
+      <!-- Right: Rules + Machine Definition -->
+      <aside class="panel rules-panel">
+        <div class="panel-header">
+          <h2>Transition Rules</h2>
+          <div class="rules-actions">
+            <button id="addRuleBtn" class="btn btn-mini btn-primary">+ Add Rule</button>
+          </div>
+        </div>
+
+        <div class="rules-legend">
+          <span>δ(state, read) → (newState, write, move)</span>
+        </div>
+
+        <div class="table-wrap">
+          <table class="rules-table" id="rulesTable">
+            <thead>
+              <tr>
+                <th>State</th>
+                <th>Read</th>
+                <th>→ State</th>
+                <th>Write</th>
+                <th>Move</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="rulesBody"></tbody>
+          </table>
+        </div>
+
+        <div class="panel-header sub">
+          <h3>Machine Definition</h3>
+        </div>
+        <div class="def-grid">
+          <div class="def-row">
+            <label>Initial State</label>
+            <input type="text" id="initialState" value="q0" />
+          </div>
+          <div class="def-row">
+            <label>Accept States</label>
+            <input type="text" id="acceptStates" value="qA" placeholder="comma separated" />
+          </div>
+          <div class="def-row">
+            <label>Reject States</label>
+            <input type="text" id="rejectStates" value="qR" placeholder="comma separated" />
+          </div>
+          <div class="def-row">
+            <label>Blank Symbol</label>
+            <input type="text" id="blankSymbol" value="_" maxlength="1" />
+          </div>
+        </div>
+
+        <div class="panel-header sub">
+          <h3>About the Concept</h3>
+        </div>
+        <div class="about">
+          <p>A <strong>Turing Machine</strong> is a 7-tuple <em>M = (Q, Σ, Γ, δ, q₀, qₐ, qᵣ)</em> — a mathematical model
+            that defines what is computable. It has an infinite tape, a read/write head, and a finite set of states.</p>
+          <p>At each step, based on the current state and symbol read, the transition function <em>δ</em> determines the
+            new state, the symbol to write, and whether the head moves <strong>L</strong>eft, <strong>R</strong>ight, or
+            <strong>S</strong>tays.</p>
+          <p>Try presets above, or write your own rules. The simulator halts when it enters an accept/reject state or
+            when no rule matches.</p>
+        </div>
+      </aside>
+    </main>
+
+    <!-- <footer class="foot">
+    <span>Built for TOC Assignment · δ(Claude, code) → (done, UI, R)</span>
+  </footer> -->
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
