@@ -365,8 +365,19 @@ function renderTape(writtenPos = null) {
 
     tapeTrack.appendChild(cell);
   }
-  // No manual transform: cells are symmetric around TM.head (pad on each side),
-  // flex `justify-content: center` centers the middle cell at the viewport center.
+
+  // Center the head cell (middle child at index `pad`) in the viewport.
+  // JS measurement — robust across cell widths (responsive) and browsers that
+  // left-align flex overflow instead of centering it.
+  const headCell = tapeTrack.children[pad];
+  if (headCell) {
+    const viewport = tapeTrack.parentElement;
+    const viewportWidth = viewport.clientWidth;
+    const cellWidth = headCell.offsetWidth;
+    const headLeft = headCell.offsetLeft;
+    const translate = (viewportWidth / 2) - headLeft - (cellWidth / 2);
+    tapeTrack.style.transform = `translateX(${translate}px)`;
+  }
 }
 
 // ---------- UI Updates ----------
@@ -671,6 +682,13 @@ speedSlider.addEventListener('input', (e) => {
 // initial
 currentSpeed = 1050 - (+speedSlider.value);
 speedValEl.textContent = `${currentSpeed}ms`;
+
+// Re-center tape on resize (cell width changes at breakpoints)
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => renderTape(), 80);
+});
 
 // ---------- Boot ----------
 loadPreset('palindrome');

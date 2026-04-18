@@ -202,9 +202,8 @@ html, body {
 .tape-track {
   display: flex;
   gap: 4px;
-  justify-content: center;
-  min-width: 100%;
-  will-change: contents;
+  will-change: transform;
+  transition: transform 0.15s ease-out;
 }
 
 .tape-cell {
