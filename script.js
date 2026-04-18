@@ -366,18 +366,19 @@ function renderTape(writtenPos = null) {
     tapeTrack.appendChild(cell);
   }
 
-  // Center the head cell (middle child at index `pad`) in the viewport.
-  // JS measurement — robust across cell widths (responsive) and browsers that
-  // left-align flex overflow instead of centering it.
-  const headCell = tapeTrack.children[pad];
-  if (headCell) {
-    const viewport = tapeTrack.parentElement;
-    const viewportWidth = viewport.clientWidth;
-    const cellWidth = headCell.offsetWidth;
-    const headLeft = headCell.offsetLeft;
-    const translate = (viewportWidth / 2) - headLeft - (cellWidth / 2);
-    tapeTrack.style.transform = `translateX(${translate}px)`;
-  }
+  // Center the head cell in the viewport — use rAF to ensure layout is computed
+  requestAnimationFrame(() => {
+    const headCell = tapeTrack.children[pad];
+    if (headCell) {
+      const viewport = tapeTrack.parentElement;
+      const viewportWidth = viewport.clientWidth;
+      const cellWidth = headCell.offsetWidth;
+      // Calculate the head cell's left offset relative to the track start
+      const headLeft = headCell.offsetLeft;
+      const translate = (viewportWidth / 2) - headLeft - (cellWidth / 2);
+      tapeTrack.style.transform = `translateX(${translate}px)`;
+    }
+  });
 }
 
 // ---------- UI Updates ----------
@@ -691,5 +692,8 @@ window.addEventListener('resize', () => {
 });
 
 // ---------- Boot ----------
-loadPreset('palindrome');
-$('presetSelect').value = 'palindrome';
+// Defer initial load to ensure CSS is fully applied and layout is computed
+requestAnimationFrame(() => {
+  loadPreset('palindrome');
+  $('presetSelect').value = 'palindrome';
+});
